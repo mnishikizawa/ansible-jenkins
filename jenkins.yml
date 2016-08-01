@@ -1,0 +1,53 @@
+---
+- hosts: jenkins
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  tasks:
+  - name: Copy docker repository
+    copy: src=files/docker.repo dest=/etc/yum.repos.d
+
+  - name: DO YUM UPDATE to fix conflicts
+    shell: yum update -y
+
+  - name: Download Jenkins repository
+    get_url: url=http://pkg.jenkins-ci.org/redhat/jenkins.repo dest=/etc/yum.repos.d/jenkins.repo
+
+  - name: Import Jenkins GPG key
+    command: rpm --import http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key
+
+  - name: Install required packages for jenkins
+    yum: name={{item}} state=present
+    with_items:
+      - java-1.7.0-openjdk
+      - docker-engine
+      - jenkins
+
+  - name: Disable IPv6
+    command: "{{item}}"
+    with_items:
+      - sysctl -w net.ipv6.conf.all.disable_ipv6=1
+      - sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+#  - name: Modify listen address
+#    lineinfile: >
+#      dest=/etc/sysconfig/jenkins
+#      regexp='JENKINS_LISTEN_ADDRESS=""'
+#      line='JENKINS_LISTEN_ADDRESS="0.0.0.0"'
+
+  - name: Disable Jenkins setup wizard
+    lineinfile: >
+      dest=/etc/sysconfig/jenkins
+      regexp='JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true"'
+      line='JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false"'
+
+  - name: Add jenkins user to docker group
+    shell: usermod -G docker jenkins
+
+  - name: Start servics
+    service: name={{item}} state=started
+    with_items:
+      - jenkins
+      - docker
+
