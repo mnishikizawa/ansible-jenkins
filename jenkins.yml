@@ -60,6 +60,9 @@
 
   - name: Create user
     shell: echo 'hpsr=new hudson.security.HudsonPrivateSecurityRealm(false); hpsr.createAccount("jenkins", "Password")' | java -jar /usr/local/bin/jenkins-cli.jar -s http://localhost:8080 groovy =
+
+  - name: Copy Jenkins config
+    copy: src=files/config.xml dest=/var/lib/jenkins owner=jenkins mode="u+rw,g-wx,o-wx"
     notify: restart jenkins
 
   handlers:
