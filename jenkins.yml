@@ -45,13 +45,23 @@
       - jenkins
       - docker
 
+  # Jenkis start up takes long time
+  - pause: seconds=10
+
   - name: Down load jenkins-cli
     get_url: url=http://localhost:8080/jnlpJars/jenkins-cli.jar dest=/usr/local/bin
 
   - name: Install jenkins plugin
-    shell: java -jar jenkins-cli.jar -s http://localhost:8080 install-plugin "{{ item }}"
+    shell: java -jar /usr/local/bin/jenkins-cli.jar -s http://localhost:8080 install-plugin "{{ item }}"
     with_items:
       - github
       - build-pipeline-plugin
       - docker-build-publish
 
+  - name: Create user
+    shell: echo 'hpsr=new hudson.security.HudsonPrivateSecurityRealm(false); hpsr.createAccount("jenkins", "Password")' | java -jar /usr/local/bin/jenkins-cli.jar -s http://localhost:8080 groovy =
+    notify: restart jenkins
+
+  handlers:
+   - name: restart jenkins
+     service: name=jenkins state=restarted
