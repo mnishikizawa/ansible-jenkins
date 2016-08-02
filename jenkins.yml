@@ -40,7 +40,7 @@
     shell: usermod -G docker jenkins
 
   - name: Start servics
-    service: name={{item}} state=started
+    service: name={{ item }} state=started
     with_items:
       - jenkins
       - docker
@@ -48,7 +48,7 @@
   # Jenkis start up takes long time
   - pause: seconds=10
 
-  - name: Down load jenkins-cli
+  - name: Download jenkins-cli
     get_url: url=http://localhost:8080/jnlpJars/jenkins-cli.jar dest=/usr/local/bin
 
   - name: Install jenkins plugin
