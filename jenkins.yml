@@ -69,7 +69,6 @@
       - docker-build-publish
 
   - name: Create user
-    #shell: echo 'hpsr=new hudson.security.HudsonPrivateSecurityRealm(false); hpsr.createAccount("jenkins", "Password")' | java -jar /usr/local/bin/jenkins-cli.jar -s http://localhost:8080 groovy =
     shell: echo 'hpsr=new hudson.security.HudsonPrivateSecurityRealm(false); hpsr.createAccount("{{ jenkins_user }}", "{{ jenkins_password }}")' | java -jar /usr/local/bin/jenkins-cli.jar -s http://localhost:8080 groovy =
 
   - name: Copy Jenkins config
