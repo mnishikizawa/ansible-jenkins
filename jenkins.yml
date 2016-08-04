@@ -3,9 +3,9 @@
   become: yes
   become_method: sudo
   become_user: root
-  vars_prompt: 
+  vars_prompt:
     - name: "jenkins_user"
-      prompt: "Enter User Name for jenkins"
+      prompt: "Enter Username for jenkins"
       default: jenkins
       private: no
 
